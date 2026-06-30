@@ -141,8 +141,8 @@ feed_R = 50.0           # lumped feed-port resistance (ohm)
 
 # air padding around the structure, and target free-space cell size
 pad      = 60.0 if QUICK else 150.0
-max_res  = c0 / fmax / unit / (12.0 if QUICK else 20.0)   # cells per wavelength
-fine_res = 4.0 if QUICK else 2.0                          # near-structure cell (mm)
+max_res  = c0 / fmax / unit / (12.0 if QUICK else 20.0)   # free-space cell (lambda/N)
+fine_res = 6.0 if QUICK else 3.0                          # near-structure cell (mm)
 
 # simulation box extents (mm)
 x_lim = flare + pad
@@ -176,17 +176,25 @@ def build():
                               [0.0, 0.0,  gap / 2.0],
                               'z', 1.0, priority=5)
 
-    # ---- mesh: fixed lines on the structure, then the air box, then smooth ----
-    mesh.AddLine('x', [-flare, 0.0, flare, -x_lim, x_lim])
-    mesh.AddLine('y', [0.0, -y_lim, y_lim])
-    mesh.AddLine('z', [-(gap / 2.0 + arm_L), -gap / 2.0, 0.0,
-                       gap / 2.0, gap / 2.0 + arm_L, -z_lim, z_lim])
-    # pin the engine grid to the conductor edges (thirds rule) for accuracy
+    # ---- mesh (two-stage graded mesh) ----
+    # Stage 1: lines ON the structure only, refined to the fine antenna cell size.
+    #          (Adding the air-box extent here too would smear the fine size across
+    #           the whole domain -> millions of cells; keep it structure-only.)
+    mesh.AddLine('x', [-flare, 0.0, flare])
+    mesh.AddLine('y', [0.0])
+    mesh.AddLine('z', [-(gap / 2.0 + arm_L), -gap / 2.0,
+                       gap / 2.0, gap / 2.0 + arm_L])
+    # pin the engine grid to the conductor edges (thirds rule) for accurate currents
     FDTD.AddEdges2Grid(dirs='all', properties=bowtie)
+    mesh.SmoothMeshLines('x', fine_res, ratio=1.5)
+    mesh.SmoothMeshLines('z', fine_res, ratio=1.5)
 
+    # Stage 2: add the air-box extent, then grade out to the coarse free-space cell.
+    mesh.AddLine('x', [-x_lim, x_lim])
+    mesh.AddLine('y', [-y_lim, y_lim])
+    mesh.AddLine('z', [-z_lim, z_lim])
     for d in ('x', 'y', 'z'):
-        mesh.SmoothMeshLines(d, fine_res, ratio=1.5)   # refine near fixed lines
-        mesh.SmoothMeshLines(d, max_res, ratio=1.4)    # grade out to free space
+        mesh.SmoothMeshLines(d, max_res, ratio=1.5)    # grade fine -> free space
 
     # ---- field dumps for ParaView (E-field, time-domain, VTK) ----
     # dump_mode=2 -> cell interpolation (good for visualisation); file_type=0 -> VTK
