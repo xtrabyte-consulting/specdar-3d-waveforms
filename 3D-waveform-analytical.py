@@ -226,6 +226,6 @@ fig.text(0.02, 0.015,
          color="#7d8c9a", fontsize=8.0)
 fig.text(0.97, 0.015, "Vigilon Cyber", color="#5f6f7d", fontsize=8.5, ha="right")
 
-fig.savefig("/home/claude/bowtie_standing_wave.png", dpi=300,
+fig.savefig("bowtie_standing_wave.png", dpi=300,
             facecolor=BG, bbox_inches="tight")
 print("saved")
