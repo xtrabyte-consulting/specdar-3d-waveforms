@@ -2,7 +2,8 @@
 
 Full-physics 3-D FDTD electromagnetic solve (**openEMS**) of a **pulse-modulated
 1 GHz carrier** radiating from a bowtie dipole into free space, with time-domain
-field dumps for **ParaView**.
+field dumps for **ParaView**. Will be used for model-based verification of reflection bevaior,
+carrier wave and corresponding bow-tie size alterations, and curvurature study.
 
 This is the full-wave companion to the original illustrative model. Where
 `3D-waveform-analytical.py` *assumes* the field (direct + image dipole, an
@@ -44,7 +45,7 @@ The envelope is fed to openEMS as a custom function-parser string
 ## Verification
 
 - The full 120 ns solve completed: 225,750 cells, dt 5.77 ps, 25,053 timesteps in ~3.4 min, stopped cleanly at −58 dB after the pulse.
-- Physics confirmed: field is exactly zero through the 120 ns delay, the pulse launches at t ≈ 121 ns, shows the dipole sin θ lobes reversing sign with the 1 GHz carrier, then decays — all radiating into the PML. 1,194 frames per cut-plane in C:\Users\bryce\openems_runs\bowtie_pulse\.
+- Physics confirmed: field is exactly zero through the 120 ns delay, the pulse launches at t ≈ 121 ns, shows the dipole sin θ lobes reversing sign with the 1 GHz carrier, then decays — all radiating into the PML. 1,194 frames per cut-plane in C:\Users\(your_username)\openems_runs\bowtie_pulse\.
 
 ## The model
 
@@ -61,7 +62,7 @@ The envelope is fed to openEMS as a custom function-parser string
   get a few hundred animation frames, not one per timestep). Set
   `OPENEMS_DUMP3D=1` to also dump the full 3-D volume.
 
-## Environment (locally set-up)
+## Environment (local set-up)
 
 openEMS ships native (C++) DLLs plus matching Python wheels. Python **3.13** was
 used because the openEMS **v0.37.0-rc1** Windows bundle ships `cp313` wheels
@@ -69,24 +70,24 @@ used because the openEMS **v0.37.0-rc1** Windows bundle ships `cp313` wheels
 wheel). What was installed:
 
 ```
-openEMS bundle (DLLs + wheels)  ->  C:\Users\bryce\openEMS
-Python 3.13 venv                ->  C:\Users\bryce\openems-venv
+openEMS bundle (DLLs + wheels)  ->  C:\Users\(your_username)\openEMS
+Python 3.13 venv                ->  C:\Users\(your_username)\openems-venv
   numpy, matplotlib, h5py
   csxcad-0.7.0rc1-cp313, openems-0.37.0rc1-cp313   (from the bundle)
-CSXCAD_INSTALL_PATH = C:\Users\bryce\openEMS       (persisted; lets Python find the DLLs)
+CSXCAD_INSTALL_PATH = C:\Users\(your_username)\openEMS       (persisted; lets Python find the DLLs)
 ```
 
 ### Reproducing the install from scratch
 
 1. Download `openEMS_x64_v0.37.0-rc1_msvc.zip` from
    <https://github.com/thliebig/openEMS-Project/releases> and extract to
-   `C:\Users\bryce\openEMS`.
+   `C:\Users\(your_username)\openEMS`.
 2. ```powershell
-   py -3.13 -m venv C:\Users\bryce\openems-venv
-   C:\Users\bryce\openems-venv\Scripts\python.exe -m pip install numpy matplotlib h5py
-   C:\Users\bryce\openems-venv\Scripts\python.exe -m pip install C:\Users\bryce\openEMS\python\csxcad-*-cp313-*.whl
-   C:\Users\bryce\openems-venv\Scripts\python.exe -m pip install C:\Users\bryce\openEMS\python\openems-*-cp313-*.whl
-   setx CSXCAD_INSTALL_PATH "C:\Users\bryce\openEMS"
+   py -3.13 -m venv C:\Users\(your_username)\openems-venv
+   C:\Users\(your_username)\openems-venv\Scripts\python.exe -m pip install numpy matplotlib h5py
+   C:\Users\(your_username)\openems-venv\Scripts\python.exe -m pip install C:\Users\(your_username)\openEMS\python\csxcad-*-cp313-*.whl
+   C:\Users\(your_username)\openems-venv\Scripts\python.exe -m pip install C:\Users\(your_username)\openEMS\python\openems-*-cp313-*.whl
+   setx CSXCAD_INSTALL_PATH "C:\Users\(your_username)\openEMS"
    ```
 3. **ParaView** (for visualization): install from <https://www.paraview.org/download/>
    (5.11+). Not required to run the solve — only to view the results.
@@ -98,10 +99,10 @@ CSXCAD_INSTALL_PATH = C:\Users\bryce\openEMS       (persisted; lets Python find 
 
 ```powershell
 # full-fidelity run (120 ns delay, lambda/20 mesh) -> a few minutes
-C:\Users\bryce\openems-venv\Scripts\python.exe "3D-waveform-openems.py"
+C:\Users\(your_username)\openems-venv\Scripts\python.exe "3D-waveform-openems.py"
 
 # fast smoke test (6 ns delay, coarse mesh, small box) -> ~10 seconds
-$env:OPENEMS_QUICK=1; C:\Users\bryce\openems-venv\Scripts\python.exe "3D-waveform-openems.py"
+$env:OPENEMS_QUICK=1; C:\Users\(your_username)\openems-venv\Scripts\python.exe "3D-waveform-openems.py"
 ```
 
 | Env flag | Effect |
@@ -111,7 +112,7 @@ $env:OPENEMS_QUICK=1; C:\Users\bryce\openems-venv\Scripts\python.exe "3D-wavefor
 | `OPENEMS_OUT=<dir>` | override output directory |
 | `CSXCAD_INSTALL_PATH=<dir>` | location of the openEMS DLLs |
 
-**Output goes to `C:\Users\bryce\openems_runs\bowtie_pulse\`** (a local, *non-OneDrive*
+**Output goes to `C:\Users\(your_username)\openems_runs\bowtie_pulse\`** (a local, *non-OneDrive*
 folder by default — a transient solve writes hundreds of small `.vtr` files and you
 do not want OneDrive syncing each one). Override with `OPENEMS_OUT`.
 
@@ -133,7 +134,7 @@ viewable in `AppCSXCAD.exe`).
 ```powershell
 & "C:\Program Files\ParaView 5.13.0\bin\pvpython.exe" "paraview_view.py"
 # or point it at a specific run:
-& "...\pvpython.exe" "paraview_view.py" "C:\Users\bryce\openems_runs\bowtie_pulse"
+& "...\pvpython.exe" "paraview_view.py" "C:\Users\(your_username)\openems_runs\bowtie_pulse"
 ```
 You can also paste it into ParaView's **Tools ▸ Python Shell**:
 `exec(open(r"...\paraview_view.py").read())`.
