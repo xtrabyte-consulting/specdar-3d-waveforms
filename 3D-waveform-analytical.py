@@ -1,11 +1,3 @@
-# ----------------------------------------------------------------------
-# ANALYTICAL near-field model of a z-oriented bowtie Robert's dipole radiating
-# toward a planar conducting reflector. Standing wave = direct field +
-# image field. This is an illustrative analytical model, NOT a full-wave
-# solve. Physics-correct fringe spacing (lambda/2) and dipole sin(theta)
-# pattern are used here for a visual approximation.
-# ----------------------------------------------------------------------
-
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
@@ -14,6 +6,13 @@ from matplotlib import gridspec
 from matplotlib.patches import Polygon, Rectangle
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
+# ----------------------------------------------------------------------
+# ANALYTICAL near-field model of a z-oriented dipole (bowtie) radiating
+# toward a planar conducting reflector. Standing wave = direct field +
+# image field. This is an illustrative analytical model, NOT a full-wave
+# solve. Physics-correct fringe spacing (lambda/2) and dipole sin(theta)
+# pattern, used here for a status-meeting visual.
+# ----------------------------------------------------------------------
 
 c = 2.99792458e8
 f = 1.0e9                 # 1 GHz carrier
